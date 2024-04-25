@@ -17,5 +17,5 @@ cargo add wurth-telesto
 ## Installing the CLI
 
 ```shell
-cargo install --git https://github.com/team-arrow-racing/wurth-telesto.git
+cargo install --git https://github.com/team-arrow-racing/wurth-telesto.git --features="cli"
 ```
