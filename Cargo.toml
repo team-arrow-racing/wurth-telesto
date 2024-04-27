@@ -15,7 +15,8 @@ embedded-io-adapters = { version = "0.6.1", optional = true, features = [
 embedded-io-async = "0.6.1"
 heapless = "0.8.0"
 tokio = { version = "1.37.0", features = ["full"], optional = true }
+tokio-serial = { version = "5.4.4", optional = true }
 
 [features]
 defmt-03 = ["embedded-io-async/defmt-03", "heapless/defmt-03"]
-cli = ["dep:clap", "dep:tokio", "dep:embedded-io-adapters"]
+cli = ["dep:clap", "dep:tokio", "dep:embedded-io-adapters", "dep:tokio-serial"]
