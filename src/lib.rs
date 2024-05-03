@@ -3,7 +3,10 @@
 mod command;
 mod setting;
 
-use command::{Event, Response, MAX_PAYLOAD_LEN, START};
+use core::future::poll_fn;
+use core::task::Poll;
+
+use command::{command, Event, Response, MAX_PAYLOAD_LEN, START};
 use embedded_io_async::{Read, Write};
 use heapless::spsc::{Consumer, Producer, Queue};
 use heapless::Vec;
@@ -55,6 +58,22 @@ where
             },
         )
     }
+
+    pub async fn reset(&mut self) -> Result<(), W::Error> {
+        let mut buf = [0; 224];
+        let size = command(&mut buf, command::Request::Reset, &[]);
+        self.serial.write(&buf[..size]).await?;
+
+        poll_fn(|cx| {
+            if let Some(_response) = self.response.dequeue() {
+                return Poll::Ready(Ok(()));
+            } else {
+                cx.waker().wake_by_ref();
+                return Poll::Pending;
+            }
+        })
+        .await
+    }
 }
 
 pub struct Ingress<'a, S>
@@ -76,11 +95,10 @@ where
             self.serial.read_exact(&mut buf).await.ok();
 
             if buf[0] != START {
-                return Err(IngestError::StartByte);
+                continue;
             }
 
             let cmd = buf[1];
-
             let len = buf[2] as usize;
 
             if len > MAX_PAYLOAD_LEN {
@@ -88,9 +106,10 @@ where
             }
 
             let mut payload = Vec::<u8, MAX_PAYLOAD_LEN>::new();
+            unsafe { payload.set_len(len) };
             self.serial.read_exact(&mut payload[0..len]).await.ok();
 
-            let mut checksum = [0; 1];
+            let mut _checksum = [0; 1];
             self.serial.read_exact(&mut buf).await.ok();
 
             //todo: check checksum
