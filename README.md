@@ -19,3 +19,9 @@ cargo add wurth-telesto
 ```shell
 cargo install --git https://github.com/team-arrow-racing/wurth-telesto.git --features="cli"
 ```
+
+To run use the CLI with `cargo run` use:
+
+```shell
+cargo run --features cli -- <args here>
+```
