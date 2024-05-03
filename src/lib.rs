@@ -34,8 +34,8 @@ where
     W: Write,
 {
     pub fn new<R: Read>(
-        reader: R,
         writer: W,
+        reader: R,
         response_queue: &'a mut Queue<ResponseFrame, 2>,
         event_queue: &'a mut Queue<EventFrame, 16>,
     ) -> (Self, Ingress<'a, R>) {
