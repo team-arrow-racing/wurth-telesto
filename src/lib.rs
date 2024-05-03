@@ -25,7 +25,7 @@ where
     W: Write,
 {
     serial: W,
-    response: Consumer<'a, ResponseFrame, 1>,
+    response: Consumer<'a, ResponseFrame, 2>,
     event: Consumer<'a, EventFrame, 16>,
 }
 
@@ -36,7 +36,7 @@ where
     pub fn new<R: Read>(
         reader: R,
         writer: W,
-        response_queue: &'a mut Queue<ResponseFrame, 1>,
+        response_queue: &'a mut Queue<ResponseFrame, 2>,
         event_queue: &'a mut Queue<EventFrame, 16>,
     ) -> (Self, Ingress<'a, R>) {
         let (response_producer, response_consumer) = response_queue.split();
@@ -62,7 +62,7 @@ where
     S: Read,
 {
     serial: S,
-    response: Producer<'a, ResponseFrame, 1>,
+    response: Producer<'a, ResponseFrame, 2>,
     event: Producer<'a, EventFrame, 16>,
 }
 
