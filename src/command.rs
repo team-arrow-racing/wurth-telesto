@@ -68,6 +68,7 @@ pub(crate) fn checksum(bytes: &[u8]) -> u8 {
     result
 }
 
+#[allow(clippy::from_over_into)]
 impl Into<u8> for Request {
     fn into(self) -> u8 {
         self as u8
