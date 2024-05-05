@@ -5,7 +5,7 @@ use std::ptr::addr_of_mut;
 use clap::{Parser, Subcommand};
 use heapless::spsc::Queue;
 use tokio_serial::SerialPortBuilderExt;
-use wurth_telesto::{EventFrame, Radio, ResponseFrame};
+use wurth_telesto::{Event, Frame, Radio, Response};
 
 #[derive(Parser)]
 pub struct Cli {
@@ -39,8 +39,8 @@ async fn main() {
 
     let (tx, rx) = adapter::make_split_stream(stream);
 
-    static mut QUEUE_RESPONSE: Queue<ResponseFrame, 2> = Queue::new();
-    static mut QUEUE_EVENT: Queue<EventFrame, 16> = Queue::new();
+    static mut QUEUE_RESPONSE: Queue<Frame<Response>, 2> = Queue::new();
+    static mut QUEUE_EVENT: Queue<Frame<Event>, 16> = Queue::new();
 
     let (mut radio, mut ingress) = Radio::new(
         tx,

@@ -6,20 +6,16 @@ mod setting;
 use core::future::poll_fn;
 use core::task::Poll;
 
-use command::{command, Event, Response, MAX_PAYLOAD_LEN, START};
+pub use command::{Event, Response};
+
+use command::{command, MAX_PAYLOAD_LEN, START};
 use embedded_io_async::{Read, Write};
 use heapless::spsc::{Consumer, Producer, Queue};
 use heapless::Vec;
 
 #[derive(Debug)]
-pub struct ResponseFrame {
-    command: Response,
-    data: Vec<u8, MAX_PAYLOAD_LEN>,
-}
-
-#[derive(Debug)]
-pub struct EventFrame {
-    command: Event,
+pub struct Frame<T> {
+    command: T,
     data: Vec<u8, MAX_PAYLOAD_LEN>,
 }
 
@@ -28,8 +24,8 @@ where
     W: Write,
 {
     serial: W,
-    response: Consumer<'a, ResponseFrame, 2>,
-    event: Consumer<'a, EventFrame, 16>,
+    response: Consumer<'a, Frame<Response>, 2>,
+    event: Consumer<'a, Frame<Event>, 16>,
 }
 
 impl<'a, W> Radio<'a, W>
@@ -39,8 +35,8 @@ where
     pub fn new<R: Read>(
         writer: W,
         reader: R,
-        response_queue: &'a mut Queue<ResponseFrame, 2>,
-        event_queue: &'a mut Queue<EventFrame, 16>,
+        response_queue: &'a mut Queue<Frame<Response>, 2>,
+        event_queue: &'a mut Queue<Frame<Event>, 16>,
     ) -> (Self, Ingress<'a, R>) {
         let (response_producer, response_consumer) = response_queue.split();
         let (event_producer, event_consumer) = event_queue.split();
@@ -59,14 +55,37 @@ where
         )
     }
 
+    /// Poll until an event is received.
+    pub async fn poll_event(&mut self) -> Frame<Event> {
+        poll_fn(|cx| {
+            if let Some(event) = self.event.dequeue() {
+                Poll::Ready(event)
+            } else {
+                cx.waker().wake_by_ref();
+                Poll::Pending
+            }
+        })
+        .await
+    }
+
+    /// Performs a soft-reset of the radio module.
+    ///
+    /// Returns [`Ok`] once the reset has been confirmed by the device.
     pub async fn reset(&mut self) -> Result<(), W::Error> {
         let mut buf = [0; 224];
         let size = command(&mut buf, command::Request::Reset, &[]);
         self.serial.write(&buf[..size]).await?;
 
+        let _response = self.poll_response().await;
+
+        Ok(())
+    }
+
+    /// Poll until a response frame is received through the response channel.
+    async fn poll_response(&mut self) -> Frame<Response> {
         poll_fn(|cx| {
-            if let Some(_response) = self.response.dequeue() {
-                Poll::Ready(Ok(()))
+            if let Some(response) = self.response.dequeue() {
+                Poll::Ready(response)
             } else {
                 cx.waker().wake_by_ref();
                 Poll::Pending
@@ -81,8 +100,8 @@ where
     S: Read,
 {
     serial: S,
-    response: Producer<'a, ResponseFrame, 2>,
-    event: Producer<'a, EventFrame, 16>,
+    response: Producer<'a, Frame<Response>, 2>,
+    event: Producer<'a, Frame<Event>, 16>,
 }
 
 impl<'a, S> Ingress<'a, S>
@@ -116,7 +135,7 @@ where
 
             if let Some(event) = Event::try_from_raw(cmd) {
                 self.event
-                    .enqueue(EventFrame {
+                    .enqueue(Frame::<Event> {
                         command: event,
                         data: payload,
                     })
@@ -126,7 +145,7 @@ where
 
             if let Some(response) = Response::try_from_raw(cmd) {
                 self.response
-                    .enqueue(ResponseFrame {
+                    .enqueue(Frame::<Response> {
                         command: response,
                         data: payload,
                     })
