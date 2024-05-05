@@ -66,10 +66,10 @@ where
 
         poll_fn(|cx| {
             if let Some(_response) = self.response.dequeue() {
-                return Poll::Ready(Ok(()));
+                Poll::Ready(Ok(()))
             } else {
                 cx.waker().wake_by_ref();
-                return Poll::Pending;
+                Poll::Pending
             }
         })
         .await
