@@ -129,6 +129,7 @@ impl Response {
             x if x == Self::SetUserSetting as u8 => Some(Self::SetUserSetting),
             x if x == Self::GetUserSetting as u8 => Some(Self::GetUserSetting),
             x if x == Self::Rssi as u8 => Some(Self::Rssi),
+            x if x == Self::Shutdown as u8 => Some(Self::Shutdown),
             x if x == Self::Standby as u8 => Some(Self::Standby),
             x if x == Self::TransmitPower as u8 => Some(Self::TransmitPower),
             x if x == Self::FactoryReset as u8 => Some(Self::FactoryReset),
