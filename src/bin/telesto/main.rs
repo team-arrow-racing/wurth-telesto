@@ -13,7 +13,7 @@ pub struct Cli {
     subcommand: Commands,
     #[arg(value_name = "SERIAL PORT")]
     port: String,
-    /// Baud rate. Defaults to 115200
+    /// Baud rate.
     #[arg(default_value_t = 115200)]
     baud: u32,
 }
