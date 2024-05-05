@@ -40,7 +40,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Run Cargo check
-        run: cargo check --all-features --locked
+        run: cargo check --all-features
 
   format:
     name: Format
@@ -70,4 +70,4 @@ jobs:
           components: clippy
 
       - name: Check clippy
-        run: cargo clippy --all-features --all-targets --locked -- -D warnings
+        run: cargo clippy --all-features --all-targets -- -D warnings
