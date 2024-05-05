@@ -5,6 +5,7 @@ pub const START: u8 = 0x02;
 pub const MAX_PAYLOAD_LEN: usize = 224;
 
 /// Command.
+#[allow(unused)]
 #[derive(Debug)]
 pub enum Command {
     Request(Request),
@@ -13,6 +14,7 @@ pub enum Command {
 }
 
 /// Request command.
+#[allow(unused)]
 #[derive(Debug)]
 pub enum Request {
     /// Send data to configured address.
@@ -76,6 +78,7 @@ impl Into<u8> for Request {
 }
 
 /// Send data error kind.
+#[allow(unused)]
 #[derive(Debug, Clone, Copy)]
 pub enum SendDataError {
     AckTimeout = 0x01,
