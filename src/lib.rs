@@ -47,7 +47,7 @@ where
                 response: response_consumer,
                 event: event_consumer,
             },
-            Ingress {
+            Ingress::<'a> {
                 serial: reader,
                 response: response_producer,
                 event: event_producer,
