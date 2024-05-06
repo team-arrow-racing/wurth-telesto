@@ -8,7 +8,7 @@ use core::task::Poll;
 
 pub use command::{Event, Response};
 
-use command::{command, MAX_PAYLOAD_LEN, START};
+use command::{command, Request, SendDataError, MAX_PAYLOAD_LEN, START};
 use embedded_io_async::{Read, Write};
 use heapless::spsc::{Consumer, Producer, Queue};
 use heapless::Vec;
@@ -75,6 +75,22 @@ where
         .await
     }
 
+    pub async fn send(&mut self, data: &[u8]) -> Result<(), Error<SendDataError, W::Error>> {
+        let mut buf = [0; 224];
+        let size = command(&mut buf, Request::SendData, data);
+        self.serial.write(&buf[..size]).await.map_err(Error::Io)?;
+
+        let response = self.poll_response().await;
+
+        let status: u8 = response.data[0].into();
+
+        if status == 0 {
+            Ok(())
+        } else {
+            Err(Error::Status(status.into()))
+        }
+    }
+
     /// Performs a soft-reset of the radio module.
     ///
     /// Returns [`Ok`] once the reset has been confirmed by the device.
@@ -85,14 +101,12 @@ where
 
         let response = self.poll_response().await;
 
-        if let Some(status) = response.data.get(0) {
-            if *status == 0 {
-                return Ok(());
-            } else {
-                return Err(Error::Status(()));
-            }
+        let status = response.data[0];
+
+        if status == 0 {
+            Ok(())
         } else {
-            return Err(Error::Status(()));
+            Err(Error::Status(()))
         }
     }
 

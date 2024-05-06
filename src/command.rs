@@ -76,14 +76,33 @@ impl Into<u8> for Request {
 }
 
 /// Send data error kind.
-#[allow(unused)]
 #[derive(Debug, Clone, Copy)]
 pub enum SendDataError {
-    AckTimeout = 0x01,
-    InvalidChannel = 0x02,
-    ChannelBusy = 0x03,
-    ModuleBusy = 0x04,
-    PayloadInvalid = 0xFF,
+    /// No ACK received within a time-out after using all MAC retrys.
+    AckTimeout,
+    /// Invalid channel selected.
+    InvalidChannel,
+    /// Channel is busy.
+    ChannelBusy,
+    /// Module is currently busy.
+    ModuleBusy,
+    /// Payload too long.
+    PayloadInvalid,
+    /// Unrecognised error response.
+    Other(u8),
+}
+
+impl From<u8> for SendDataError {
+    fn from(value: u8) -> Self {
+        match value {
+            0x01 => SendDataError::AckTimeout,
+            0x02 => SendDataError::InvalidChannel,
+            0x03 => SendDataError::ChannelBusy,
+            0x04 => SendDataError::ModuleBusy,
+            0xFF => SendDataError::PayloadInvalid,
+            _ => SendDataError::Other(value),
+        }
+    }
 }
 
 /// Command response.
