@@ -39,14 +39,14 @@ async fn main() {
 
     let (tx, rx) = adapter::make_split_stream(stream);
 
-    static mut QUEUE_RESPONSE: Queue<Frame<Response>, 2> = Queue::new();
-    static mut QUEUE_EVENT: Queue<Frame<Event>, 16> = Queue::new();
+    let mut queue_response = Queue::new();
+    let mut queue_event = Queue::new();
 
     let (mut radio, mut ingress) = Radio::new(
         tx,
         rx,
-        unsafe { addr_of_mut!(QUEUE_RESPONSE).as_mut().unwrap() },
-        unsafe { addr_of_mut!(QUEUE_EVENT).as_mut().unwrap() },
+        unsafe { addr_of_mut!(queue_response).as_mut().unwrap() },
+        unsafe { addr_of_mut!(queue_event).as_mut().unwrap() },
     );
 
     tokio::task::spawn(async move {
