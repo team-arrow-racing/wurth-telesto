@@ -19,6 +19,13 @@ pub struct Frame<T> {
     data: Vec<u8, MAX_PAYLOAD_LEN>,
 }
 
+/// Error kind.
+#[derive(Debug)]
+pub enum Error<S, IO> {
+    Status(S),
+    Io(IO),
+}
+
 pub struct Radio<'a, W>
 where
     W: Write,
@@ -71,14 +78,22 @@ where
     /// Performs a soft-reset of the radio module.
     ///
     /// Returns [`Ok`] once the reset has been confirmed by the device.
-    pub async fn reset(&mut self) -> Result<(), W::Error> {
+    pub async fn reset(&mut self) -> Result<(), Error<(), W::Error>> {
         let mut buf = [0; 224];
         let size = command(&mut buf, command::Request::Reset, &[]);
-        self.serial.write(&buf[..size]).await?;
+        self.serial.write(&buf[..size]).await.map_err(Error::Io)?;
 
-        let _response = self.poll_response().await;
+        let response = self.poll_response().await;
 
-        Ok(())
+        if let Some(status) = response.data.get(0) {
+            if *status == 0 {
+                return Ok(());
+            } else {
+                return Err(Error::Status(()));
+            }
+        } else {
+            return Err(Error::Status(()));
+        }
     }
 
     /// Poll until a response frame is received through the response channel.
