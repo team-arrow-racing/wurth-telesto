@@ -5,7 +5,7 @@ use std::ptr::addr_of_mut;
 use clap::{Parser, Subcommand};
 use heapless::spsc::Queue;
 use tokio_serial::SerialPortBuilderExt;
-use wurth_telesto::{Event, Frame, Radio, Response};
+use wurth_telesto::Radio;
 
 #[derive(Parser)]
 pub struct Cli {
@@ -20,6 +20,10 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Send data to configured address.
+    ///
+    /// You may send data using escaped strings such as \uXXXX and \xNN.
+    Send { data: String },
     /// Reset module.
     Reset,
     /// Shutdown module.
@@ -54,6 +58,10 @@ async fn main() {
     });
 
     match args.subcommand {
+        Commands::Send { data } => {
+            let output = unescape::unescape(&data).unwrap();
+            radio.send(output.as_bytes()).await.unwrap()
+        }
         Commands::Reset => radio.reset().await.unwrap(),
         _ => todo!(),
     }
