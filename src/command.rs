@@ -3,6 +3,8 @@ pub const START: u8 = 0x02;
 
 /// Maximum length.
 pub const MAX_PAYLOAD_LEN: usize = 224;
+const HEADER_LEN: usize = 3;
+const CHECKSUM_LEN: usize = 1;
 
 /// Command.
 #[allow(unused)]
@@ -50,24 +52,20 @@ pub enum Request {
 pub(crate) fn command(buf: &mut [u8], kind: Request, data: &[u8]) -> usize {
     assert!(data.len() <= MAX_PAYLOAD_LEN);
 
-    let len = data.len() + 4;
+    let len = HEADER_LEN + data.len() + CHECKSUM_LEN;
     assert!(buf.len() >= len);
 
     buf[0] = START;
     buf[1] = kind as u8;
-    buf[2..(data.len() + 2)].copy_from_slice(data);
-    buf[len - 1] = checksum(&buf[0..len - 2]);
+    buf[2] = data.len() as u8;
+    buf[3..(data.len() + 3)].copy_from_slice(data);
+    buf[len - 1] = checksum(&buf[0..len - 1]);
 
     len
 }
 
 pub(crate) fn checksum(bytes: &[u8]) -> u8 {
-    let mut result = bytes[0];
-    for byte in bytes[1..].iter() {
-        result ^= byte;
-    }
-
-    result
+    bytes.iter().fold(0, |acc, &x| acc ^ x)
 }
 
 #[allow(clippy::from_over_into)]
@@ -166,5 +164,20 @@ impl Event {
             x if x == Self::PacketTransmit as u8 => Some(Self::PacketTransmit),
             _ => None,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn frame_checksum() {
+        let data = [
+            0x02, 0x00, 0x0C, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64,
+            0x21,
+        ];
+
+        assert_eq!(checksum(&data), 0x0F);
     }
 }
