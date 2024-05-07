@@ -86,6 +86,8 @@ where
     }
 
     pub async fn send(&mut self, data: &[u8]) -> Result<(), Error<SendDataError, W::Error>> {
+        assert!(data.len() <= 220);
+
         let mut buf = [0; 224];
         let size = command(&mut buf, Request::SendData, data);
         self.serial.write(&buf[..size]).await.map_err(Error::Io)?;
