@@ -85,6 +85,9 @@ where
         .await
     }
 
+    /// Send data command.
+    ///
+    /// Panics if the data length is larger than 220 (the maximum allowed payload).
     pub async fn send(&mut self, data: &[u8]) -> Result<(), Error<SendDataError, W::Error>> {
         assert!(data.len() <= 220);
 
