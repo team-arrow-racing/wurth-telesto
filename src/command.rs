@@ -17,7 +17,7 @@ pub enum Command {
 
 /// Request command.
 #[allow(unused)]
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum Request {
     /// Send data to configured address.
     SendData = 0x00,
@@ -106,7 +106,7 @@ impl From<u8> for SendDataError {
 }
 
 /// Command response.
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum Response {
     /// Data has been sent.
     SendData = 0x40,
@@ -158,7 +158,7 @@ impl Response {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum Event {
     /// Data has been repeated.
     DataRepeat = 0x80,
