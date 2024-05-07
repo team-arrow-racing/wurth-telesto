@@ -5,7 +5,7 @@ use std::ptr::addr_of_mut;
 use clap::{Parser, Subcommand};
 use heapless::spsc::Queue;
 use tokio_serial::SerialPortBuilderExt;
-use wurth_telesto::Radio;
+use wurth_telesto::{Event, Radio};
 
 #[derive(Parser)]
 pub struct Cli {
@@ -28,6 +28,8 @@ enum Commands {
     Reset,
     /// Shutdown module.
     Shutdown,
+    /// Echo incomming data sent to the configured address.
+    Echo,
 }
 
 #[tokio::main]
@@ -63,6 +65,20 @@ async fn main() {
             radio.send(output.as_bytes()).await.unwrap()
         }
         Commands::Reset => radio.reset().await.unwrap(),
+        Commands::Echo => loop {
+            let event = radio.poll_event().await;
+
+            match event.command() {
+                Event::DataReceived => {
+                    println!("Got data: {:#02x?}", event.data());
+
+                    radio.send(event.data()).await.unwrap();
+
+                    println!("Sent response.");
+                }
+                _ => {}
+            }
+        },
         _ => todo!(),
     }
 
