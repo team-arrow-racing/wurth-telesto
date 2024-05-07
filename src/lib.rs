@@ -19,6 +19,16 @@ pub struct Frame<T> {
     data: Vec<u8, MAX_PAYLOAD_LEN>,
 }
 
+impl<T> Frame<T> {
+    pub fn command(&self) -> &T {
+        &self.command
+    }
+
+    pub fn data(&self) -> &[u8] {
+        &self.data
+    }
+}
+
 /// Error kind.
 #[derive(Debug)]
 pub enum Error<S, IO> {
