@@ -25,3 +25,7 @@ To run use the CLI with `cargo run` use:
 ```shell
 cargo run --features cli -- <args here>
 ```
+
+## References
+
+- [Telesto-III User Manual](https://www.we-online.com/components/products/manual/2609011091000_Telesto-III%202609011x9100x%20Manual_rev2.11.pdf)
