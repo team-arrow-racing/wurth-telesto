@@ -38,6 +38,10 @@ enum Commands {
     TxPower { power: u8 },
     /// Set channel.
     Channel { channel: u8 },
+    /// Destination network ID.
+    DestNet { id: u8 },
+    /// Destination address.
+    DestAddr { address: u8 },
 }
 
 #[tokio::main]
@@ -100,6 +104,8 @@ async fn main() {
         }
         Commands::TxPower { power } => radio.tx_power(power).await.unwrap(),
         Commands::Channel { channel } => radio.channel(channel).await.unwrap(),
+        Commands::DestNet { id } => radio.destination_net(id).await.unwrap(),
+        Commands::DestAddr { address } => radio.destination_address(address).await.unwrap(),
         _ => todo!(),
     }
 

@@ -189,6 +189,42 @@ where
         }
     }
 
+    /// Set destination net ID.
+    pub async fn destination_net(&mut self, id: u8) -> Result<(), Error<(), W::Error>> {
+        let mut buf = [0; 224];
+        let size = command(&mut buf, command::Request::SetDestinationNetworkId, &[id]);
+        self.serial.write(&buf[..size]).await.map_err(Error::Io)?;
+
+        let response = self.poll_response().await;
+        let status = response.data[0];
+
+        if status == 0x00 {
+            Ok(())
+        } else {
+            Err(Error::Status(()))
+        }
+    }
+
+    /// Set destination net ID.
+    pub async fn destination_address(&mut self, address: u8) -> Result<(), Error<(), W::Error>> {
+        let mut buf = [0; 224];
+        let size = command(
+            &mut buf,
+            command::Request::SetDestinationAddress,
+            &[address],
+        );
+        self.serial.write(&buf[..size]).await.map_err(Error::Io)?;
+
+        let response = self.poll_response().await;
+        let status = response.data[0];
+
+        if status == 0x00 {
+            Ok(())
+        } else {
+            Err(Error::Status(()))
+        }
+    }
+
     /// Poll until a response frame is received through the response channel.
     async fn poll_response(&mut self) -> Frame<Response> {
         poll_fn(|cx| {
