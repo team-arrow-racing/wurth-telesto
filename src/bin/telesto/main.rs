@@ -5,7 +5,7 @@ use std::ptr::addr_of_mut;
 use clap::{Parser, Subcommand};
 use heapless::spsc::Queue;
 use tokio_serial::SerialPortBuilderExt;
-use wurth_telesto::{Event, Radio};
+use wurth_telesto::{Event, Mode, Radio};
 
 #[derive(Parser)]
 pub struct Cli {
@@ -42,6 +42,8 @@ enum Commands {
     DestNet { id: u8 },
     /// Destination address.
     DestAddr { address: u8 },
+    /// Operating mode.
+    Mode { mode: Mode },
 }
 
 #[tokio::main]
@@ -106,6 +108,7 @@ async fn main() {
         Commands::Channel { channel } => radio.channel(channel).await.unwrap(),
         Commands::DestNet { id } => radio.destination_net(id).await.unwrap(),
         Commands::DestAddr { address } => radio.destination_address(address).await.unwrap(),
+        Commands::Mode { mode } => radio.mode(mode).await.unwrap(),
         _ => todo!(),
     }
 

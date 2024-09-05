@@ -1,4 +1,4 @@
-#![cfg_attr(not(test), no_std)]
+#![cfg_attr(not(any(test, feature = "cli")), no_std)]
 
 mod command;
 mod setting;
@@ -6,7 +6,7 @@ mod setting;
 use core::future::poll_fn;
 use core::task::Poll;
 
-pub use command::{Event, Response};
+pub use command::{Event, Mode, Response};
 
 use command::{command, Request, SendDataError, MAX_PAYLOAD_LEN, START};
 use embedded_io_async::{Read, Write};
@@ -213,6 +213,24 @@ where
             command::Request::SetDestinationAddress,
             &[address],
         );
+        self.serial.write(&buf[..size]).await.map_err(Error::Io)?;
+
+        let response = self.poll_response().await;
+        let status = response.data[0];
+
+        if status == 0x00 {
+            Ok(())
+        } else {
+            Err(Error::Status(()))
+        }
+    }
+
+    /// Set operating mode.
+    ///
+    /// The mode change is performed after the achnoledge response is transmitted.
+    pub async fn mode(&mut self, mode: Mode) -> Result<(), Error<(), W::Error>> {
+        let mut buf = [0; 224];
+        let size = command(&mut buf, command::Request::SetMode, &[mode as u8]);
         self.serial.write(&buf[..size]).await.map_err(Error::Io)?;
 
         let response = self.poll_response().await;

@@ -173,6 +173,16 @@ pub enum Event {
     PacketTransmit,
 }
 
+/// Operating mode.
+#[derive(Debug, Copy, Clone)]
+#[cfg_attr(feature = "cli", derive(clap::ValueEnum))]
+pub enum Mode {
+    /// Transparent mode.
+    Transparent,
+    /// Command mode.
+    Command,
+}
+
 impl Event {
     pub fn try_from_raw(raw: u8) -> Option<Self> {
         // bit of a hack, but it ensures a single source of truth for the integer -> enum mapping.
