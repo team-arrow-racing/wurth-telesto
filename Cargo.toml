@@ -19,11 +19,7 @@ tokio-serial = { version = "5.4.4", optional = true }
 unescape = { version = "0.1.0", optional = true }
 
 [features]
+std = []
 defmt-03 = ["embedded-io-async/defmt-03", "heapless/defmt-03"]
-cli = [
-    "dep:clap",
-    "dep:tokio",
-    "dep:embedded-io-adapters",
-    "dep:tokio-serial",
-    "dep:unescape",
-]
+tokio = ["std", "dep:tokio", "dep:embedded-io-adapters", "dep:tokio-serial"]
+cli = ["dep:clap", "dep:unescape", "tokio"]

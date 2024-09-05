@@ -2,6 +2,8 @@
 
 mod command;
 mod setting;
+#[cfg(feature = "tokio")]
+pub mod tokio;
 
 use core::future::poll_fn;
 use core::task::Poll;

@@ -1,9 +1,6 @@
-mod adapter;
-
-use std::ptr::addr_of_mut;
-
 use clap::{Parser, Subcommand};
 use heapless::spsc::Queue;
+use std::ptr::addr_of_mut;
 use tokio_serial::SerialPortBuilderExt;
 use wurth_telesto::{Event, Mode, Radio};
 
@@ -57,7 +54,7 @@ async fn main() {
         .open_native_async()
         .unwrap();
 
-    let (tx, rx) = adapter::make_split_stream(stream);
+    let (tx, rx) = wurth_telesto::tokio::split_stream(stream);
 
     let mut queue_response = Queue::new();
     let mut queue_event = Queue::new();

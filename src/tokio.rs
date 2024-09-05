@@ -5,7 +5,8 @@ use std::sync::Arc;
 use tokio::sync::Mutex;
 use tokio_serial::SerialStream;
 
-pub fn make_split_stream(stream: SerialStream) -> (SerialTx, SerialRx) {
+/// Creates a shared stream from a [`SerialStream`]
+pub fn split_stream(stream: SerialStream) -> (SerialTx, SerialRx) {
     let serial = Arc::new(Mutex::new(stream));
 
     (
