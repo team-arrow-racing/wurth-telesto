@@ -125,6 +125,22 @@ where
         }
     }
 
+    /// Performs a factory reset of the radio module.
+    pub async fn factory_reset(&mut self) -> Result<(), Error<(), W::Error>> {
+        let mut buf = [0; 224];
+        let size = command(&mut buf, command::Request::FactoryReset, &[]);
+        self.serial.write(&buf[..size]).await.map_err(Error::Io)?;
+
+        let response = self.poll_response().await;
+        let status = response.data[0];
+
+        if status == 0 {
+            Ok(())
+        } else {
+            Err(Error::Status(()))
+        }
+    }
+
     /// Enters the radio into standby mode.
     ///
     /// Returns [`Ok`] confirming the device will enter standby.
