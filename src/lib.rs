@@ -96,8 +96,7 @@ where
         self.serial.write(&buf[..size]).await.map_err(Error::Io)?;
 
         let response = self.poll_response().await;
-
-        let status: u8 = response.data[0].into();
+        let status = response.data[0];
 
         if status == 0 {
             Ok(())
@@ -115,7 +114,6 @@ where
         self.serial.write(&buf[..size]).await.map_err(Error::Io)?;
 
         let response = self.poll_response().await;
-
         let status = response.data[0];
 
         if status == 0 {
