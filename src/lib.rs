@@ -13,6 +13,7 @@ use embedded_io_async::{Read, Write};
 use heapless::spsc::{Consumer, Producer, Queue};
 use heapless::Vec;
 
+/// Command/response frame.
 #[derive(Debug)]
 pub struct Frame<T> {
     command: T,
@@ -36,6 +37,7 @@ pub enum Error<S, IO> {
     Io(IO),
 }
 
+/// Radio module instance.
 pub struct Radio<'a, W>
 where
     W: Write,
@@ -201,6 +203,7 @@ where
     }
 }
 
+/// Incomming data handler.
 pub struct Ingress<'a, S>
 where
     S: Read,

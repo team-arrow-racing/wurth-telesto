@@ -158,6 +158,7 @@ impl Response {
     }
 }
 
+/// Event kind.
 #[derive(Debug, Clone, Copy)]
 pub enum Event {
     /// Data has been repeated.
