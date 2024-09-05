@@ -81,13 +81,10 @@ async fn main() {
         Commands::Reset => radio.reset().await.unwrap(),
         Commands::Echo => loop {
             let event = radio.poll_event().await;
-
             match event.command() {
                 Event::DataReceived => {
                     println!("Got data: {:#02x?}", event.data());
-
                     radio.send(event.data()).await.unwrap();
-
                     println!("Sent response.");
                 }
                 _ => {}
@@ -96,7 +93,6 @@ async fn main() {
         Commands::Standby => radio.standby().await.unwrap(),
         Commands::Rssi => {
             let rssi = radio.rssi().await.unwrap();
-
             if rssi == 0x80 {
                 println!("No RSSI available");
             } else {
