@@ -5,12 +5,11 @@ mod setting;
 #[cfg(feature = "tokio")]
 pub mod tokio;
 
-use core::future::poll_fn;
-use core::task::Poll;
-
 pub use command::{Event, Mode, Response};
 
 use command::{command, Request, SendDataError, MAX_PAYLOAD_LEN, START};
+use core::future::poll_fn;
+use core::task::Poll;
 use embedded_io_async::{Read, Write};
 use heapless::spsc::{Consumer, Producer, Queue};
 use heapless::Vec;
