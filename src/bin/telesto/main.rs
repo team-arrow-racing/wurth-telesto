@@ -36,6 +36,8 @@ enum Commands {
     Rssi,
     /// Transmit power.
     TxPower { power: u8 },
+    /// Set channel.
+    Channel { channel: u8 },
 }
 
 #[tokio::main]
@@ -97,6 +99,7 @@ async fn main() {
             }
         }
         Commands::TxPower { power } => radio.tx_power(power).await.unwrap(),
+        Commands::Channel { channel } => radio.channel(channel).await.unwrap(),
         _ => todo!(),
     }
 

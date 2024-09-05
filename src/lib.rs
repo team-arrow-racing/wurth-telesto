@@ -171,6 +171,22 @@ where
         }
     }
 
+    /// Set the channel.
+    pub async fn channel(&mut self, channel: u8) -> Result<(), Error<(), W::Error>> {
+        let mut buf = [0; 224];
+        let size = command(&mut buf, command::Request::SetChannel, &[channel]);
+        self.serial.write(&buf[..size]).await.map_err(Error::Io)?;
+
+        let response = self.poll_response().await;
+        let status = response.data[0];
+
+        if status == channel {
+            Ok(())
+        } else {
+            Err(Error::Status(()))
+        }
+    }
+
     /// Poll until a response frame is received through the response channel.
     async fn poll_response(&mut self) -> Frame<Response> {
         poll_fn(|cx| {
