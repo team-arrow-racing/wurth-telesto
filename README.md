@@ -28,4 +28,4 @@ cargo run --features cli -- <args here>
 
 ## References
 
-- [Telesto-III User Manual](https://www.we-online.com/components/products/manual/2609011091000_Telesto-III%202609011x9100x%20Manual_rev2.11.pdf)
+- [Telesto-III User Manual](https://www.we-online.com/components/products/manual/2609011091000_Telesto-III%202609011x9100x%20Manual_rev2.12.pdf)
