@@ -1,4 +1,4 @@
-#![cfg_attr(not(any(test, feature = "cli")), no_std)]
+#![cfg_attr(all(not(test), not(feature = "std")), no_std)]
 
 mod command;
 mod setting;
