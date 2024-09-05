@@ -123,6 +123,24 @@ where
         }
     }
 
+    /// Enters the radio into standby mode.
+    ///
+    /// Returns [`Ok`] confirming the device will enter standby.
+    pub async fn standby(&mut self) -> Result<(), Error<(), W::Error>> {
+        let mut buf = [0; 224];
+        let size = command(&mut buf, command::Request::Standby, &[]);
+        self.serial.write(&buf[..size]).await.map_err(Error::Io)?;
+
+        let response = self.poll_response().await;
+        let status = response.data[0];
+
+        if status == 0 {
+            Ok(())
+        } else {
+            Err(Error::Status(()))
+        }
+    }
+
     /// Poll until a response frame is received through the response channel.
     async fn poll_response(&mut self) -> Frame<Response> {
         poll_fn(|cx| {

@@ -30,6 +30,8 @@ enum Commands {
     Shutdown,
     /// Echo incomming data sent to the configured address.
     Echo,
+    /// Enter standby.
+    Standby,
 }
 
 #[tokio::main]
@@ -79,6 +81,7 @@ async fn main() {
                 _ => {}
             }
         },
+        Commands::Standby => radio.standby().await.unwrap(),
         _ => todo!(),
     }
 
