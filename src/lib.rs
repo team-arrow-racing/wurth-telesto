@@ -153,6 +153,24 @@ where
         Ok(status)
     }
 
+    /// Set the transmit power.
+    ///
+    /// A value outisde the allowable range will result in an error response.
+    pub async fn tx_power(&mut self, power: u8) -> Result<(), Error<(), W::Error>> {
+        let mut buf = [0; 224];
+        let size = command(&mut buf, command::Request::TransmitPower, &[power]);
+        self.serial.write(&buf[..size]).await.map_err(Error::Io)?;
+
+        let response = self.poll_response().await;
+        let status = response.data[0];
+
+        if status == power {
+            Ok(())
+        } else {
+            Err(Error::Status(()))
+        }
+    }
+
     /// Poll until a response frame is received through the response channel.
     async fn poll_response(&mut self) -> Frame<Response> {
         poll_fn(|cx| {

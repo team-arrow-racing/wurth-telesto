@@ -34,6 +34,8 @@ enum Commands {
     Standby,
     /// Receive signal strength of last received packet.
     Rssi,
+    /// Transmit power.
+    TxPower { power: u8 },
 }
 
 #[tokio::main]
@@ -94,6 +96,7 @@ async fn main() {
                 println!("RSSI: {}dBm", rssi);
             }
         }
+        Commands::TxPower { power } => radio.tx_power(power).await.unwrap(),
         _ => todo!(),
     }
 
