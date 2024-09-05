@@ -161,26 +161,26 @@ impl Response {
 #[derive(Debug, Clone, Copy)]
 pub enum Event {
     /// Data has been repeated.
-    DataRepeat = 0x80,
+    DataRepeat,
     /// Data has been received.
-    DataReceived = 0x81,
+    DataReceived,
     /// Reset has been applied.
-    Reset = 0x85,
+    Reset,
     /// Woke up from standby mode.
-    Wakeup = 0x8F,
+    Wakeup,
     /// Radio packet has been transmitted.
-    PacketTransmit = 0x90,
+    PacketTransmit,
 }
 
 impl Event {
     pub fn try_from_raw(raw: u8) -> Option<Self> {
         // bit of a hack, but it ensures a single source of truth for the integer -> enum mapping.
         match raw {
-            x if x == Self::DataRepeat as u8 => Some(Self::DataRepeat),
-            x if x == Self::DataReceived as u8 => Some(Self::DataReceived),
-            x if x == Self::Reset as u8 => Some(Self::Reset),
-            x if x == Self::Wakeup as u8 => Some(Self::Wakeup),
-            x if x == Self::PacketTransmit as u8 => Some(Self::PacketTransmit),
+            0x80 => Some(Self::DataRepeat),
+            0x81 => Some(Self::DataReceived),
+            0x85 => Some(Self::Reset),
+            0x8F => Some(Self::Wakeup),
+            0x90 => Some(Self::PacketTransmit),
             _ => None,
         }
     }
