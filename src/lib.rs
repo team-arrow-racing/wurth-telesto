@@ -205,7 +205,7 @@ where
         }
     }
 
-    /// Set destination net ID.
+    /// Set destination address.
     pub async fn destination_address(&mut self, address: u8) -> Result<(), Error<(), W::Error>> {
         let mut buf = [0; 224];
         let size = command(
