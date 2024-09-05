@@ -32,6 +32,8 @@ enum Commands {
     Echo,
     /// Enter standby.
     Standby,
+    /// Receive signal strength of last received packet.
+    Rssi,
 }
 
 #[tokio::main]
@@ -82,6 +84,16 @@ async fn main() {
             }
         },
         Commands::Standby => radio.standby().await.unwrap(),
+        Commands::Rssi => {
+            let rssi = radio.rssi().await.unwrap();
+
+            if rssi == 0x80 {
+                println!("No RSSI available");
+            } else {
+                let rssi = rssi as i8;
+                println!("RSSI: {}dBm", rssi);
+            }
+        }
         _ => todo!(),
     }
 

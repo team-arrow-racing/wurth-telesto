@@ -141,6 +141,18 @@ where
         }
     }
 
+    /// Gets the receive signal strength (RSSI) of the last packet received.
+    pub async fn rssi(&mut self) -> Result<u8, Error<(), W::Error>> {
+        let mut buf = [0; 224];
+        let size = command(&mut buf, command::Request::Rssi, &[]);
+        self.serial.write(&buf[..size]).await.map_err(Error::Io)?;
+
+        let response = self.poll_response().await;
+        let status = response.data[0];
+
+        Ok(status)
+    }
+
     /// Poll until a response frame is received through the response channel.
     async fn poll_response(&mut self) -> Frame<Response> {
         poll_fn(|cx| {
