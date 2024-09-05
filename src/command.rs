@@ -88,19 +88,19 @@ pub enum SendDataError {
     ModuleBusy,
     /// Payload too long.
     PayloadInvalid,
-    /// Unrecognised error response.
-    Other(u8),
+    /// Error code not recognised by this library.
+    Unknown(u8),
 }
 
 impl From<u8> for SendDataError {
     fn from(value: u8) -> Self {
         match value {
-            0x01 => SendDataError::AckTimeout,
-            0x02 => SendDataError::InvalidChannel,
-            0x03 => SendDataError::ChannelBusy,
-            0x04 => SendDataError::ModuleBusy,
-            0xFF => SendDataError::PayloadInvalid,
-            _ => SendDataError::Other(value),
+            0x01 => Self::AckTimeout,
+            0x02 => Self::InvalidChannel,
+            0x03 => Self::ChannelBusy,
+            0x04 => Self::ModuleBusy,
+            0xFF => Self::PayloadInvalid,
+            _ => Self::Unknown(value),
         }
     }
 }
