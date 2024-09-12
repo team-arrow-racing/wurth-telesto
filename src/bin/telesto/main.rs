@@ -78,16 +78,13 @@ async fn main() {
         Commands::Reset => radio.reset().await.unwrap(),
         Commands::Echo => loop {
             let event = radio.poll_event().await;
-            match event.command() {
-                Event::DataReceived => {
-                    let data = &event.data()[0..event.data().len() - 1];
-                    let strength = *event.data().last().unwrap() as i8;
+            if let Event::DataReceived = event.command() {
+                let data = &event.data()[0..event.data().len() - 1];
+                let strength = *event.data().last().unwrap() as i8;
 
-                    println!("Got data: {:#02x?} with RSSI: {}dBm", data, strength);
-                    radio.send(event.data()).await.unwrap();
-                    println!("Sent response.");
-                }
-                _ => {}
+                println!("Got data: {:#02x?} with RSSI: {}dBm", data, strength);
+                radio.send(event.data()).await.unwrap();
+                println!("Sent response.");
             }
         },
         Commands::Standby => radio.standby().await.unwrap(),
