@@ -337,7 +337,7 @@ where
 }
 
 /// Ingest error.
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum IngestError {
     /// Start byte was not correct.
     StartByte,
