@@ -1,7 +1,6 @@
 #![cfg_attr(all(not(test), not(feature = "std")), no_std)]
 
 mod command;
-mod setting;
 #[cfg(feature = "tokio")]
 pub mod tokio;
 
